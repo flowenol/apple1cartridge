@@ -1,0 +1,482 @@
+; apple-1 constants
+#define monitor $FF1F
+#define echo    $FFEF
+#define prhex   $FFE5
+#define kbd_data $D010
+#define kbd_cr $D011
+
+; zero page variables
+
+; content copy variables
+#define dest_addr $30
+#define src_addr  $32
+#define src_len   $34
+#define copy_counter   $36
+
+; string printing variables
+#define str_len     $38
+#define str_addr    $40
+
+; entries scanning variables
+#define entries_counter  $42
+#define entries_scan_addr $43
+#define entry_segments $45
+#define entry_to_load $46
+
+; jmp addr variable
+#define jmp_addr $47
+
+; option select variables
+#define option_data $49
+#define key_data $50
+
+* = $4000
+
+start
+
+    lda #$0D
+    jsr echo
+    jsr print_entries
+    jsr get_option
+
+    ; option validation
+    lda option_data
+    beq start
+
+    cmp rom_content
+    beq valid_option
+    bpl start
+
+valid_option
+    lda option_data
+    sta entry_to_load
+
+;;; load-start
+load_entry
+
+    ; init entries counter
+    lda #$01
+    sta entries_counter
+
+    ; init entries scan addr
+    lda #<rom_content
+    sta entries_scan_addr
+
+    lda #>rom_content
+    sta entries_scan_addr+1
+
+    ; skip number of entries byte
+    ldx #entries_scan_addr
+    jsr increment_16bit
+
+check_load
+
+    ; load number of entry segments
+    ldy #$00
+    lda (entries_scan_addr),Y
+    sta entry_segments
+
+    ; skip number of entry segments
+    ldx #entries_scan_addr
+    jsr increment_16bit
+
+    lda entry_to_load
+    cmp entries_counter
+
+    bne skip_entry
+
+load_segment
+
+    ; load segment length
+    ldy #$00
+    lda (entries_scan_addr),Y
+    sta src_len
+    ldx #entries_scan_addr
+    jsr increment_16bit
+    lda (entries_scan_addr),Y
+    sta src_len+1
+
+    ; load dest addr
+    ldx #entries_scan_addr
+    jsr increment_16bit
+    lda (entries_scan_addr),Y
+    sta dest_addr
+    ldx #entries_scan_addr
+    jsr increment_16bit
+    lda (entries_scan_addr),Y
+    sta dest_addr+1
+
+    ; load source addr
+    ldx #entries_scan_addr
+    jsr increment_16bit
+    lda (entries_scan_addr),Y
+    sta src_addr
+    ldx #entries_scan_addr
+    jsr increment_16bit
+    lda (entries_scan_addr),Y
+    sta src_addr+1
+
+    ; copy segment from source to destination
+    jsr init_copy
+
+    ; proceed to next segment
+    ldx #entries_scan_addr
+    jsr increment_16bit
+
+    dec entry_segments
+    bne load_segment
+
+load_program
+
+    ; skip entry string
+    ldy #$00
+    lda (entries_scan_addr),Y
+    tay
+    iny
+    tya
+    ldx #entries_scan_addr
+    jsr add_to_addr
+
+    ; load entry jump address
+    lda entries_scan_addr
+    sta dest_addr
+    lda entries_scan_addr+1
+    sta dest_addr+1
+
+    ldy #$00
+    lda (dest_addr),Y
+    sta jmp_addr
+
+    iny
+
+    lda (dest_addr),Y
+    sta jmp_addr+1
+
+    jmp (jmp_addr)
+
+skip_entry
+    ; skip length, dest addr, content
+    ldx #entries_scan_addr
+    lda #$06
+    jsr add_to_addr
+    dec entry_segments
+    bne skip_entry
+
+    ; skip entry string
+    ldy #$00
+    lda (entries_scan_addr),Y
+    tay
+    iny
+    tya
+    ldx #entries_scan_addr
+    jsr add_to_addr
+
+    ; skip entry jump address
+    lda #$02
+    ldx #entries_scan_addr
+    jsr add_to_addr
+
+    inc entries_counter
+    jmp check_load
+
+init_copy
+    lda #$00
+    sta copy_counter
+    sta copy_counter+1
+copy
+    ; load byte from rom into ram
+    ldy #$00
+    lda (src_addr),Y
+    sta (dest_addr),Y
+
+    ; increment source address
+    ldx #src_addr
+    jsr increment_16bit
+
+    ; increment destination address
+    ldx #dest_addr
+    jsr increment_16bit
+
+    ; compare counter lower byte with source length lower byte
+    ; if not equal increment counter
+    lda src_len
+    cmp copy_counter
+    bne increment_copy_counter
+
+    ; compare counter upper byte with content length upper byte
+    ; if not equal increment counter
+    lda src_len+1
+    cmp copy_counter+1
+    bne increment_copy_counter
+
+    rts
+
+increment_copy_counter
+    ldx #copy_counter
+    jsr increment_16bit
+
+    jmp copy
+
+;;; load-end
+
+;;; printing
+print_entries
+    ; print welcome string
+    lda #<welcome_str
+    sta str_addr
+    lda #>welcome_str
+    sta str_addr+1
+    jsr print_str
+
+    ; init entries counter
+    lda #$00
+    sta entries_counter
+
+    ; init entries scan addr
+    lda #<rom_content
+    sta entries_scan_addr
+
+    lda #>rom_content
+    sta entries_scan_addr+1
+
+    ; skip number of entries byte
+    ldx #entries_scan_addr
+    jsr increment_16bit
+
+print_entry
+
+    ; load number of entry segments
+    ldy #$00
+    lda (entries_scan_addr),Y
+    sta entry_segments
+
+    ; skip number of entry segments
+    ldx #entries_scan_addr
+    jsr increment_16bit
+
+skip_segment
+    ; skip length, dest addr, content
+    ldx #entries_scan_addr
+    lda #$06
+    jsr add_to_addr
+    dec entry_segments
+    bne skip_segment
+
+    ; print entry number
+    inc entries_counter
+    ldx #entries_counter
+    jsr print_number
+
+    ; print dot and space
+    lda #'.'
+    jsr echo
+    lda #' '
+    jsr echo
+
+    ; print entry string
+    lda entries_scan_addr
+    sta str_addr
+    lda entries_scan_addr+1
+    sta str_addr+1
+    jsr print_str
+    lda #$0D
+    jsr echo
+
+    ; skip entry string
+    ldy #$00
+    lda (entries_scan_addr),Y
+    tay
+    iny
+    tya
+    ldx #entries_scan_addr
+    jsr add_to_addr
+
+    ; skip entry jump address
+    lda #$02
+    jsr add_to_addr
+
+    ; if not last entry then repeat
+    lda rom_content
+    cmp entries_counter
+    bne print_entry
+
+print_entries_done
+    ; print choose string
+    lda #<choose_str
+    sta str_addr
+    lda #>choose_str
+    sta str_addr+1
+    jsr print_str
+
+    rts
+
+print_str
+    ; store string length
+    ldy #$00
+    lda (str_addr),Y
+    sta str_len
+
+    ; skip length byte from string address
+    ldx #str_addr
+    jsr increment_16bit
+
+print_str_loop
+    lda (str_addr),Y
+    jsr echo
+    iny
+    cpy str_len
+    bne print_str_loop
+    rts
+
+; prints only numbers in range 0-19
+print_number
+    lda #$09
+    cmp $00,X
+    bmi greater_than_nine
+    lda $00,X
+    jsr prhex
+    jmp print_number_done
+greater_than_nine
+    lda #$01
+    jsr prhex
+    ; save number in Y
+    lda $00,X
+    tay
+    ; decrement 10
+    lda #$09
+    sta $00,X
+    tya
+    sbc $00,X
+    jsr prhex
+    ; restore number from Y
+    tya
+    sta $00,X
+print_number_done
+    rts
+
+;;; printing-end
+
+;;; get-option
+get_option
+    ; init digits counter
+    ldx #$00
+get_key
+    ; wait for key
+    lda kbd_cr
+    bpl get_key
+    lda kbd_data
+
+    ; store key data
+    sta key_data
+
+    ; if CR check if option is satisfied
+    cmp #$8D ; CR
+    beq get_key_done
+
+    ; check range 0-9
+    cmp #$B0 ; 0
+    bmi get_key
+
+    cmp #$BA ; 9
+    bpl get_key
+
+    ; which digit we are processing?
+    txa
+
+    ; second digit
+    cmp #$01
+    beq two_digit
+
+    ; if we have already processed second digit then only CR is eligible
+    cmp #$02
+    beq get_key
+
+one_digit
+    ; ???
+    sec
+    lda key_data
+    sbc #$B0
+    sta option_data
+
+echo_key
+    ; echo digit
+    lda key_data
+    jsr echo
+
+    ; increment digit counter
+    inx
+    jmp get_key
+
+two_digit
+    lda #$00
+    ldy option_data
+    ; if first digit was 0 then simply add second to A
+    beq two_digit_inc_done
+    clc
+two_digit_inc
+    ; loop adding 10 to A first digit times
+    adc #$0A
+    dey
+    bne two_digit_inc
+two_digit_inc_done
+    ; save current option calculation on stack
+    pha
+
+    ; compute int value from second digit
+    sec
+    lda key_data
+    sbc #$B0
+    ; and store in option_data
+    sta option_data
+
+    ; restore previously calculated first digit part from stack
+    pla
+    clc
+    ; and add second digit value
+    adc option_data
+    ; store fully computed option value
+    sta option_data
+    ; and wait for CR
+    jmp echo_key
+
+get_key_done
+    ; if CR was pressed as the first key, then simply omit
+    txa
+    beq get_key
+
+    ; print CR
+    lda #$8D ; CR
+    jsr echo
+    rts
+
+;;; get-option-end
+
+;;; tools
+increment_16bit
+    inc $00,X
+    bne increment_16bit_done
+    inx
+    inc $00,X
+increment_16bit_done
+    rts
+
+add_to_addr
+    clc
+    adc $00,X
+    sta $00,X
+    bcs add_to_addr_done
+    jmp add_to_addr_done
+add_to_addr_carry
+    inx
+    inc $00,X
+add_to_addr_done
+    rts
+
+;;; tools-end
+
+
+welcome_str .byt $14,"AVAILABLE OPTIONS:",$0D,$0D
+choose_str .byt $0F,$0D,"CHOOSE OPTION:"
+
+rom_content
+#include "src/rom_content.xa"
