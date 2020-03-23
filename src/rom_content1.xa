@@ -9,13 +9,10 @@ basic_str .byt $05,"BASIC"
 basic_jmp_addr   .word $e000
 
 apple30th
-apple30th_seg    .byt $02
-apple30th_1_len    .word $0D80
-apple30th_1_addr   .word $0280
-apple30th_1_cont_start  .word apple30th_cont
-apple30th_2_len    .word $0D80
-apple30th_2_addr   .word $0280
-apple30th_2_cont_start  .word apple30th_cont
+apple30th_seg    .byt $01
+apple30th_len    .word $0D80
+apple30th_addr   .word $0280
+apple30th_cont_start  .word apple30th_cont
 apple30th_str .byt $13,"APPLE 30TH BIRTHDAY"
 apple30th_jmp_addr .word $0280
 

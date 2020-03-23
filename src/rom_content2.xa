@@ -1,0 +1,25 @@
+number_of_entries .byt $02
+
+; 00: <start_low_byte> <start_high_byte> <end_low_byte> <end_high_byte>
+memorytest
+memorytest_seg    .byt $02
+memorytest_1_len    .word $0010
+memorytest_1_addr   .word $0000
+memorytest_1_cont_start  .word memorytest_cont
+memorytest_2_len    .word $0122
+memorytest_2_addr   .word $0280
+memorytest_2_cont_start  .word memorytest_cont+16
+memorytest_str .byt $10,"MEMORY TEST 280R"
+memorytest_jmp_addr .word $FF1F
+
+; 44: <low_byte> <high_byte>
+disassembler
+disassembler_seg      .byt $01
+disassembler_1_len    .word $0200
+disassembler_1_addr   .word $0800
+disassembler_1_cont_start  .word disassembler_cont
+disassembler_str .byt $11,"DISASSEMBLER 800R"
+disassembler_jmp_addr   .word $FF1F
+
+memorytest_cont .bin 0,306,"inc/a1mt.bin"
+disassembler_cont .bin 0,512,"inc/disassembler.bin"
