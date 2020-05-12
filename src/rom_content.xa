@@ -1,0 +1,2 @@
+;#include "src/rom_content1.xa"
+#include "src/rom_content2.xa"

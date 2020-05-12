@@ -1,0 +1,135 @@
+; zero page variables
+
+; content copy variables
+#define dest_addr $30
+#define src_addr  $32
+#define src_len   $34
+#define copy_counter $36
+
+; entries scanning variables
+#define entries_scan_addr $43
+
+; jmp addr variable
+#define jmp_addr $47
+
+* = $4000
+
+;;; load-start
+load_entry
+
+    ; init entries scan addr
+    lda #<rom_content
+    sta entries_scan_addr
+
+    lda #>rom_content
+    sta entries_scan_addr+1
+
+load_segment
+
+    ; load segment length
+    ldy #$00
+    lda (entries_scan_addr),Y
+    sta src_len
+    ldx #entries_scan_addr
+    jsr increment_16bit
+    lda (entries_scan_addr),Y
+    sta src_len+1
+
+    ; load dest addr
+    ldx #entries_scan_addr
+    jsr increment_16bit
+    lda (entries_scan_addr),Y
+    sta dest_addr
+    ldx #entries_scan_addr
+    jsr increment_16bit
+    lda (entries_scan_addr),Y
+    sta dest_addr+1
+
+    ; load source addr
+    ldx #entries_scan_addr
+    jsr increment_16bit
+    lda (entries_scan_addr),Y
+    sta src_addr
+    ldx #entries_scan_addr
+    jsr increment_16bit
+    lda (entries_scan_addr),Y
+    sta src_addr+1
+
+    ; copy segment from source to destination
+    jsr init_copy
+
+load_program
+
+    ldx #entries_scan_addr
+    jsr increment_16bit
+
+    ; load entry jump address
+    lda entries_scan_addr
+    sta dest_addr
+    lda entries_scan_addr+1
+    sta dest_addr+1
+
+    ldy #$00
+    lda (dest_addr),Y
+    sta jmp_addr
+
+    iny
+
+    lda (dest_addr),Y
+    sta jmp_addr+1
+
+    jmp (jmp_addr)
+
+init_copy
+    lda #$00
+    sta copy_counter
+    sta copy_counter+1
+copy
+    ; load byte from rom into ram
+    ldy #$00
+    lda (src_addr),Y
+    sta (dest_addr),Y
+
+    ; increment source address
+    ldx #src_addr
+    jsr increment_16bit
+
+    ; increment destination address
+    ldx #dest_addr
+    jsr increment_16bit
+
+    ; compare counter lower byte with source length lower byte
+    ; if not equal increment counter
+    lda src_len
+    cmp copy_counter
+    bne increment_copy_counter
+
+    ; compare counter upper byte with content length upper byte
+    ; if not equal increment counter
+    lda src_len+1
+    cmp copy_counter+1
+    bne increment_copy_counter
+
+    rts
+
+increment_copy_counter
+    ldx #copy_counter
+    jsr increment_16bit
+
+    jmp copy
+
+;;; load-end
+
+;;; tools
+increment_16bit
+    inc $00,X
+    bne increment_16bit_done
+    inx
+    inc $00,X
+increment_16bit_done
+    rts
+
+;;; tools-end
+
+rom_content
+#include "src/rom_applesoft.xa"
