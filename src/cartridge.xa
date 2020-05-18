@@ -462,7 +462,7 @@ add_to_addr
     clc
     adc $00,X
     sta $00,X
-    bcs add_to_addr_done
+    bcs add_to_addr_carry
     jmp add_to_addr_done
 add_to_addr_carry
     inx
