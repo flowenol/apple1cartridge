@@ -1,2 +1,73 @@
-;#include "src/rom_content1.xa"
-#include "src/rom_content2.xa"
+* = $4800
+.dsb (*-loader_end), $FF
+
+* = $4800
+rom_content = $4800
+
+number_of_entries .byt $05
+
+basic
+basic_seg      .byt $01
+basic_len    .word $1000
+basic_addr   .word $e000
+basic_cont_start  .word basic_cont
+basic_str .byt $0D,"INTEGER BASIC"
+basic_jmp_addr   .word $e000
+
+apple30th
+apple30th_seg    .byt $01
+apple30th_len    .word $0D80
+apple30th_addr   .word $0280
+apple30th_cont_start  .word apple30th_cont
+apple30th_str .byt $13,"APPLE 30TH BIRTHDAY"
+apple30th_jmp_addr .word $0280
+
+/* 00: <start_low_byte> <start_high_byte> <end_low_byte> <end_high_byte> */
+/* test address expected actual */
+/*
+0 -	All zeros - each byte of memory is verified that a 0x00 value can be written and read
+1	- All ones - each byte of memory is verified that a 0xff value can be written and read
+2	- Floating ones - eight passes, starting with 0x01 and moving the 1 bit to left each succeeding pass
+    0x02 0x04 0x08 0x10 0x20 0x40 0x80
+3	- Floating zeros - eight passes, starting with 0x7f and shifting the 0 bit to the right each succeeding pass
+    0xBF 0xDF 0xEF 0xF7 0xFB 0xFD 0xFE
+4	- Address in Address 1 - one pass with low eight bits of the locations address is written to that location
+    if this fails, you  have a problem with one of the low eight address lines (this is pretty unlikely to fail,
+    since you need these address lines in order to load and run this program)
+5	- Address in Address 2 - one pass with high eight bits of the locations address written to that location
+    if this fails, you  have a problem with one of the eight high address lines
+*/
+memorytest
+memorytest_seg    .byt $02
+memorytest_1_len    .word $0010
+memorytest_1_addr   .word $0000
+memorytest_1_cont_start  .word memorytest_cont
+memorytest_2_len    .word $0122
+memorytest_2_addr   .word $0280
+memorytest_2_cont_start  .word memorytest_cont+16
+memorytest_str .byt $10,"MEMORY TEST 280R"
+memorytest_jmp_addr .word $FF1F
+
+/* 44: <low_byte> <high_byte> */
+
+disassembler
+disassembler_seg      .byt $01
+disassembler_1_len    .word $0200
+disassembler_1_addr   .word $0800
+disassembler_1_cont_start  .word disassembler_cont
+disassembler_str .byt $11,"DISASSEMBLER 800R"
+disassembler_jmp_addr   .word $FF1F
+
+applesoft
+applesoft_seg    .byt $01
+applesoft_len    .word $1F65
+applesoft_addr   .word $6000
+applesoft_cont_start  .word applesoft_cont
+applesoft_str .byt $15,"APPLESOFT BASIC 6000R"
+applesoft_jmp_addr .word $6000
+
+basic_cont       .bin 0,4096,"inc/basic.bin"
+apple30th_cont   .bin 0,3456,"inc/apple30th.bin"
+memorytest_cont .bin 0,306,"inc/a1mt.bin"
+disassembler_cont .bin 0,512,"inc/disassembler.bin"
+applesoft_cont .bin 0,8037,"inc/applesoft.bin"

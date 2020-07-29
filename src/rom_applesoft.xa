@@ -1,7 +1,0 @@
-applesoft
-applesoft_len    .word $1F65
-applesoft_addr   .word $6000
-applesoft_cont_start  .word applesoft_cont
-applesoft_jmp_addr .word $6000
-
-applesoft_cont .bin 0,8037,"inc/applesoft.bin"
