@@ -1,15 +1,17 @@
 chip  GAL20V8
 
-NC=1 RW=2 PHI=3 A2=11 A3=10 A4=9 A5=8 A6=7 A7=6 A8=5 A9=4 A10=19 GND=12
+NC=1 RW=2 PHI=3 MOD=4 A3=11 A4=10 A5=9 A6=8 A7=7 A8=6 A9=5 A10=19 GND=12
 A11=18 A12=17 A13=16 A14=15 A15=14 RAM=20 ROM=21 FF=22 BANK=23 VCC=24
 
 equations
 
-/ROM = /A15 * A14 * /A13 * /A12 * /A11 * RW
-    + /A15 * A14 * RW * BANK
-    + A15 * /A14 * RW * BANK
-/RAM = /A15 * A14 * /A13 * /A12 * A11 * /BANK * PHI
-    + A15 * /A14 * /BANK * PHI
-    + /A15 * A14 * A13 * /BANK * PHI
-    + /A15 * A14 * /A13 * A12 * /BANK * PHI
-FF = A2 * A3 * A4 * A5 * A6 * A7 * A8 * A9 * A10 * /A11 * /A12 * /A13 * A14 * /RW * PHI
+/ROM = /A15 * A14 * /A13 * /A12 * /A11 * RW * MOD
+    + /A15 * A14 * RW * BANK * MOD
+    + A15 * /A14 * RW * BANK * MOD
+/RAM = /A15 * A14 * /A13 * /A12 * A11 * /BANK * PHI * MOD
+    + A15 * /A14 * /BANK * PHI * MOD
+    + /A15 * A14 * A13 * /BANK * PHI * MOD
+    + /A15 * A14 * /A13 * A12 * /BANK * PHI * MOD
+    + /A15 * A14 * PHI * /MOD
+    + A15 * /A14 * PHI * /MOD
+FF = A3 * A4 * A5 * A6 * A7 * A8 * A9 * A10 * /A11 * /A12 * /A13 * A14 * /RW * PHI * MOD
