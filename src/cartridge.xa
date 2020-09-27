@@ -38,6 +38,9 @@
 
 start
 
+    ; clear decimal mode
+    cld
+
     ; enable rom bank
     sta rom_bank
 

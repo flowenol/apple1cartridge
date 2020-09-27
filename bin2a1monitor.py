@@ -10,7 +10,7 @@ if __name__ == "__main__":
     def print_row(offset, row_data):
         print(hex(offset)[2:].upper() + ': ' + " ".join(row_data))
 
-    row_offset = int(sys.argv[1], 0)
+    row_offset = int(sys.argv[1], 16)
     row = list()
     with open(sys.argv[2], 'rb') as file:
         byte = file.read(1)
