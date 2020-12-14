@@ -21,7 +21,7 @@ if __name__ == "__main__":
             line = file.readline()
 
     for x in byte_data:
-        sys.stdout.write(x)
+        sys.stdout.buffer.write(x)
 
 # to visually compare
 # paste apple30th.txt <(hexdump -e '"%08.8_Ax\n"' -e '"%08.8_ax " 8/1 " %02x"' -e '"\n"' apple30th.bin)

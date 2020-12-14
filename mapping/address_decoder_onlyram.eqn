@@ -1,0 +1,9 @@
+chip  GAL20V8
+
+NC=1 PHI=2 GND=12 A12=17 A13=16 A14=15 A15=14 RAM=21 VCC=24
+
+equations
+
+/RAM = /A15 * /A14 * /A13 * A12 * PHI
+    + /A15 * /A14 * A13 * /A12 * PHI
+    + /A15 * /A14 * A13 * A12 * PHI

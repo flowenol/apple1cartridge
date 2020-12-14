@@ -4,7 +4,7 @@
 * = $4800
 rom_content = $4800
 
-number_of_entries .byt $05
+number_of_entries .byt $06
 
 /*
  How to store INTEGER BASIC programs?
@@ -74,8 +74,23 @@ applesoft_cont_start  .word applesoft_cont
 applesoft_str .byt $15,"APPLESOFT BASIC 6000R"
 applesoft_jmp_addr .word $6000
 
-basic_cont       .bin 0,4096,"inc/basic.bin"
-apple30th_cont   .bin 0,3456,"inc/apple30th.bin"
-memorytest_cont .bin 0,306,"inc/a1mt.bin"
-disassembler_cont .bin 0,512,"inc/disassembler.bin"
-applesoft_cont .bin 0,8037,"inc/applesoft.bin"
+matrix
+matrix_seg    .byt $03
+matrix_1_len    .word $1000
+matrix_1_addr   .word $E000
+matrix_1_cont_start  .word basic_cont
+matrix_2_len    .word $00B6
+matrix_2_addr   .word $004A
+matrix_2_cont_start  .word matrix_cont
+matrix_3_len    .word $0800
+matrix_3_addr   .word $0800
+matrix_3_cont_start  .word matrix_cont+$B6
+matrix_str .byt $0E,"MATRIX (BASIC)"
+matrix_jmp_addr .word $E2B3
+
+basic_cont       .bin 0,0,"inc/basic.bin"
+apple30th_cont   .bin 0,0,"inc/apple30th.bin"
+memorytest_cont .bin 0,0,"inc/a1mt.bin"
+disassembler_cont .bin 0,0,"inc/disassembler.bin"
+applesoft_cont .bin 0,0,"inc/applesoft.bin"
+matrix_cont .bin 0,0,"inc/basic/matrix-0800-1000.bin"

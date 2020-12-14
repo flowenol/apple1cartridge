@@ -1,0 +1,53 @@
+EQN2JED - Boolean Equations to JEDEC file assembler (Version V101)
+Copyright (c) National Semiconductor Corporation 1990-1993
+
+Log file for c:/APPLE1~2/ADDRES~1.EQN
+Device: 20V8
+
+Pin   Label               Type
+---   -----               ----
+2     PHI                 pos,com input
+12    GND                 ground pin
+14    A15                 pos,com input
+15    A14                 pos,com input
+16    A13                 pos,com input
+17    A12                 pos,com input
+21    RAM                 neg,com output
+24    VCC                 power pin
+
+EQN2JED - Boolean Equations to JEDEC file assembler (Version V101)
+Copyright (c) National Semiconductor Corporation 1990-1993
+
+Device Utilization:
+
+No of dedicated inputs used               :  5/14 (35.7%)
+No of dedicated outputs used              :  1/2  (50.0%)
+
+		------------------------------------------
+		Pin   Label                 Terms Usage
+		------------------------------------------
+		21    RAM                   3/8   (37.5%)
+		------------------------------------------
+		Total Terms                 3/64  (4.7%)
+		------------------------------------------
+
+EQN2JED - Boolean Equations to JEDEC file assembler (Version V101)
+Copyright (c) National Semiconductor Corporation 1990-1993
+
+                            Chip diagram (DIP)
+
+                             ._____    _____.
+                             |     \__/     |
+                             |  1        24 | VCC
+                         PHI |  2        23 | 
+                             |  3        22 | 
+                             |  4        21 | RAM
+                             |  5        20 | 
+                             |  6        19 | 
+                             |  7        18 | 
+                             |  8        17 | A12
+                             |  9        16 | A13
+                             | 10        15 | A14
+                             | 11        14 | A15
+                         GND | 12        13 | 
+                             |______________|
