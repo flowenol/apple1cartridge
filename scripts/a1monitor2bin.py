@@ -1,6 +1,9 @@
 import codecs
 import sys
 
+"""
+This utility transforms A1 monitor format data to binary and outputs to STDOUT
+"""
 if __name__ == "__main__":
 
     byte_data = list()

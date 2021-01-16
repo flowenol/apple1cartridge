@@ -68,7 +68,7 @@ disassembler_jmp_addr   .word $FF1F
 
 applesoft
 applesoft_seg    .byt $01
-applesoft_len    .word $1F65
+applesoft_len    .word $1FFF
 applesoft_addr   .word $6000
 applesoft_cont_start  .word applesoft_cont
 applesoft_str .byt $15,"APPLESOFT BASIC 6000R"
@@ -92,5 +92,5 @@ basic_cont       .bin 0,0,"inc/basic.bin"
 apple30th_cont   .bin 0,0,"inc/apple30th.bin"
 memorytest_cont .bin 0,0,"inc/a1mt.bin"
 disassembler_cont .bin 0,0,"inc/disassembler.bin"
-applesoft_cont .bin 0,0,"inc/applesoft.bin"
+applesoft_cont .bin 0,0,"inc/applesoft-lite.bin"
 matrix_cont .bin 0,0,"inc/basic/matrix-0800-1000.bin"

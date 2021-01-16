@@ -1,6 +1,10 @@
 import sys
 import binascii
 
+"""
+This utility transforms binary data to A1 monitor format, starting offset
+(in hex) is required.
+"""
 if __name__ == "__main__":
 
     if len(sys.argv) != 3:
