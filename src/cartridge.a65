@@ -499,4 +499,4 @@ welcome_str .byt $15,$0D,"AVAILABLE OPTIONS:",$0D,$0D
 choose_str .byt $0F,$0D,"CHOOSE OPTION:"
 
 loader_end
-#include "src/rom_content.xa"
+#include "src/rom_content.a65"

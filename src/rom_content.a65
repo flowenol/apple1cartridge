@@ -4,10 +4,14 @@
 * = $4800
 rom_content = $4800
 
-number_of_entries .byt $06
+; define the number of available entries
+number_of_entries .byt $08
 
+; start of configuration section
 /*
- How to store INTEGER BASIC programs?
+ Integer BASIC
+
+ How to store INTEGER BASIC programs via Apple-1 Serial Interface?
  C100R
  004A.00FFW 0800.0FFFW
  E2B3R - warm entry point
@@ -20,6 +24,9 @@ basic_cont_start  .word basic_cont
 basic_str .byt $0D,"INTEGER BASIC"
 basic_jmp_addr   .word $e000
 
+/*
+ Apple 30th anniversary demo program
+*/
 apple30th
 apple30th_seg    .byt $01
 apple30th_len    .word $0D80
@@ -29,6 +36,8 @@ apple30th_str .byt $13,"APPLE 30TH BIRTHDAY"
 apple30th_jmp_addr .word $0280
 
 /*
+ Mike Willegal's memory test program
+
  00: <start_low_byte> <start_high_byte> <end_low_byte> <end_high_byte>
  test address expected actual
 
@@ -56,7 +65,10 @@ memorytest_str .byt $10,"MEMORY TEST 280R"
 memorytest_jmp_addr .word $FF1F
 
 /*
-   44: <low_byte> <high_byte> - disassembler start address
+ Disassembler program
+
+ How to use:
+ 44: <low_byte> <high_byte> - disassembler start address
 */
 disassembler
 disassembler_seg      .byt $01
@@ -66,14 +78,21 @@ disassembler_1_cont_start  .word disassembler_cont
 disassembler_str .byt $11,"DISASSEMBLER 800R"
 disassembler_jmp_addr   .word $FF1F
 
+/*
+ Applesoft BASIC port
+*/
 applesoft
 applesoft_seg    .byt $01
-applesoft_len    .word $1FFF
+applesoft_len    .word $2000
 applesoft_addr   .word $6000
 applesoft_cont_start  .word applesoft_cont
 applesoft_str .byt $15,"APPLESOFT BASIC 6000R"
 applesoft_jmp_addr .word $6000
 
+
+/*
+ A sample Integer BASIC program with "Matrix" effect
+*/
 matrix
 matrix_seg    .byt $03
 matrix_1_len    .word $1000
@@ -88,9 +107,55 @@ matrix_3_cont_start  .word matrix_cont+$B6
 matrix_str .byt $0E,"MATRIX (BASIC)"
 matrix_jmp_addr .word $E2B3
 
+
+/*
+ A sample Applesoft BASIC program - lemonade stand simulator
+*/
+lemo
+lemo_seg    .byt $03
+lemo_1_len    .word $2000
+lemo_1_addr   .word $6000
+lemo_1_cont_start  .word applesoft_cont
+lemo_2_len    .word $1BF8
+lemo_2_addr   .word $0801
+lemo_2_cont_start  .word lemo_cont
+lemo_3_len    .word $000D
+lemo_3_addr   .word $0067
+lemo_3_cont_start  .word lemo_fix_cont
+lemo_str .byt $16,"LEMONADE STAND (ASOFT)"
+lemo_jmp_addr .word $7DFE
+
+
+/*
+ Another sample Applesoft BASIC program - counts to 10 in a loop
+*/
+count10
+count10_seg    .byt $03
+count10_1_len    .word $2000
+count10_1_addr   .word $6000
+count10_1_cont_start  .word applesoft_cont
+count10_2_len    .word $1BF8
+count10_2_addr   .word $0801
+count10_2_cont_start  .word count10_cont
+count10_3_len    .word $000D
+count10_3_addr   .word $0067
+count10_3_cont_start  .word count10_fix_cont
+count10_str .byt $13,"COUNT TO 10 (ASOFT)"
+count10_jmp_addr .word $7DFE
+
+; end of configuration section
+
+; start of binary content section
 basic_cont       .bin 0,0,"inc/basic.bin"
 apple30th_cont   .bin 0,0,"inc/apple30th.bin"
 memorytest_cont .bin 0,0,"inc/a1mt.bin"
 disassembler_cont .bin 0,0,"inc/disassembler.bin"
 applesoft_cont .bin 0,0,"inc/applesoft-lite.bin"
+applesoft_zp_cont .bin 0,0,"inc/applesoft-zp.bin"
 matrix_cont .bin 0,0,"inc/basic/matrix-0800-1000.bin"
+lemo_cont .bin 0,0,"inc/asoft/lemo.bin"
+lemo_fix_cont .byt $01,$08,$F8,$23,$F8,$23,$F8,$23,$00,$40,$00,$FF,$00,$40
+count10_cont .bin 0,0,"inc/asoft/count10.bin"
+count10_fix_cont .byt $01,$08,$51,$08,$58,$08,$58,$08,$00,$40,$00,$40,$00,$40
+
+; end of binary content section
