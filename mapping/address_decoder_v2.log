@@ -1,7 +1,7 @@
 EQN2JED - Boolean Equations to JEDEC file assembler (Version V101)
 Copyright (c) National Semiconductor Corporation 1990-1993
 
-Log file for d:\ADDRES~6.EQN
+Log file for d:/APPLE1~5/MAPPING/ADDRES~4.EQN
 Device: G22V10
 
 Pin   Label               Type
@@ -21,8 +21,8 @@ Pin   Label               Type
 14    A13                 pos,com input
 15    A14                 pos,com input
 16    A12                 pos,com input
-17    A11                 pos,com input
-18    A10                 pos,com input
+17    A10                 pos,com input
+18    A11                 pos,com input
 19    RAM2                neg,trst,com output
 20    RAM1                neg,trst,com output
 21    ROM                 neg,trst,com output
@@ -67,8 +67,8 @@ Copyright (c) National Semiconductor Corporation 1990-1993
                          MOD |  4        21 | ROM
                           A9 |  5        20 | RAM1
                           A8 |  6        19 | RAM2
-                          A7 |  7        18 | A10
-                          A6 |  8        17 | A11
+                          A7 |  7        18 | A11
+                          A6 |  8        17 | A10
                           A5 |  9        16 | A12
                           A4 | 10        15 | A14
                           A3 | 11        14 | A13
