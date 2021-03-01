@@ -8,7 +8,7 @@ This project aims to provide Apple-1 users with a quick way to expand RAM capaci
 ~30KB of on-board ROM, which can be banked in and out via software. The on-board ROM also contains a loader program which is capable of loading programs which span across non-continuous memory locations.
 
 The A1C expansion card allows via the physical switch to completely disable the loader program functionality which takes up to the 2 KB of memory
-and to provide continuous 44KB wide RAM address space,
+and to provide continuous 44KB wide RAM address space.
 
 ## Memory map
 
@@ -32,7 +32,7 @@ In RAM mode:
 
 The contents of this repository are as following:
 
-* inc/ - contains Apple-1 programs in binary format, the package is downloadable here
+* inc/ - contains Apple-1 programs in binary format, the package is downloadable [here](https://drive.google.com/file/d/1G0ycKSszlr45RE8Rp6eW-0qxz4MS9qDN/view?usp=sharing)
 * mapping/ - contains EQN and JED files for GAL22V10 based address decoder
 * scripts/ - a bunch of useful python scripts which allow conversion from binary to Woz monitor format and vice versa
 * src/ - contains the 6502 assembly sources for the Apple-1 RAM/ROM Cartridge onboard ROM loader program

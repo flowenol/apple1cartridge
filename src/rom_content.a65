@@ -162,7 +162,6 @@ apple30th_cont   .bin 0,0,"inc/apple30th.bin"
 memorytest_cont .bin 0,0,"inc/a1mt.bin"
 disassembler_cont .bin 0,0,"inc/disassembler.bin"
 applesoft_cont .bin 0,0,"inc/applesoft-lite.bin"
-applesoft_zp_cont .bin 0,0,"inc/applesoft-zp.bin"
 matrix_cont .bin 0,0,"inc/basic/matrix-0800-1000.bin"
 lemo_cont .bin 0,0,"inc/asoft/lemo.bin"
 lemo_fix_cont .byt $01,$08,$F8,$23,$F8,$23,$F8,$23,$00,$40,$00,$FF,$00,$40
