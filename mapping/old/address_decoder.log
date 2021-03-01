@@ -1,8 +1,8 @@
 EQN2JED - Boolean Equations to JEDEC file assembler (Version V101)
 Copyright (c) National Semiconductor Corporation 1990-1993
 
-Log file for d:/APPLE1~5/MAPPING/ADDRES~4.EQN
-Device: G22V10
+Log file for d:/ADDRES~1.EQN
+Device: 20V8
 
 Pin   Label               Type
 ---   -----               ----
@@ -17,15 +17,14 @@ Pin   Label               Type
 10    A4                  pos,com input
 11    A3                  pos,com input
 12    GND                 ground pin
-13    A15                 pos,com input
-14    A13                 pos,com input
+14    A15                 pos,com input
 15    A14                 pos,com input
-16    A12                 pos,com input
-17    A10                 pos,com input
+16    A13                 pos,com input
+17    A12                 pos,com input
 18    A11                 pos,com input
-19    RAM2                neg,trst,com output
-20    RAM1                neg,trst,com output
-21    ROM                 neg,trst,com output
+19    A10                 pos,com input
+20    ROM                 neg,trst,com output
+21    RAM                 neg,trst,com output
 22    FF                  pos,trst,com output
 23    BANK                pos,com input
 24    VCC                 power pin
@@ -36,22 +35,20 @@ Copyright (c) National Semiconductor Corporation 1990-1993
 Device Utilization:
 
 No of dedicated inputs used               : 12/12 (100.0%)
-No of feedbacks used as dedicated inputs  :  5/10 (50.0%)
-No of feedbacks used as dedicated outputs :  4/10 (40.0%)
+No of feedbacks used as dedicated inputs  :  5/8  (62.5%)
+No of feedbacks used as dedicated outputs :  3/8  (37.5%)
 
 		------------------------------------------
 		Pin   Label                 Terms Usage
 		------------------------------------------
 		22    FF.oe                 1/1   (100.0%)
-		22    FF                    1/10  (10.0%)
-		21    ROM.oe                1/1   (100.0%)
-		21    ROM                   3/12  (25.0%)
-		20    RAM1.oe               1/1   (100.0%)
-		20    RAM1                  3/14  (21.4%)
-		19    RAM2.oe               1/1   (100.0%)
-		19    RAM2                  6/16  (37.5%)
+		22    FF                    1/7   (14.3%)
+		21    RAM.oe                1/1   (100.0%)
+		21    RAM                   6/7   (85.7%)
+		20    ROM.oe                1/1   (100.0%)
+		20    ROM                   3/7   (42.9%)
 		------------------------------------------
-		Total Terms                17/132 (12.9%)
+		Total Terms                13/64  (20.3%)
 		------------------------------------------
 
 EQN2JED - Boolean Equations to JEDEC file assembler (Version V101)
@@ -64,13 +61,13 @@ Copyright (c) National Semiconductor Corporation 1990-1993
                          CLK |  1        24 | VCC
                          PHI |  2        23 | BANK
                           RW |  3        22 | FF
-                         MOD |  4        21 | ROM
-                          A9 |  5        20 | RAM1
-                          A8 |  6        19 | RAM2
+                         MOD |  4        21 | RAM
+                          A9 |  5        20 | ROM
+                          A8 |  6        19 | A10
                           A7 |  7        18 | A11
-                          A6 |  8        17 | A10
-                          A5 |  9        16 | A12
+                          A6 |  8        17 | A12
+                          A5 |  9        16 | A13
                           A4 | 10        15 | A14
-                          A3 | 11        14 | A13
-                         GND | 12        13 | A15
+                          A3 | 11        14 | A15
+                         GND | 12        13 | /OE
                              |______________|
