@@ -7,12 +7,12 @@ This repository contains firmware files for the "Apple-1 RAM/ROM Cartridge" expa
 This project aims to provide Apple-1 users with a quick way to expand RAM capacity in their systems up to 52 KB and to simultaneously store some Apple-1 programs in
 ~30KB of on-board ROM, which can be banked in and out via software. The on-board ROM also contains a loader program which is capable of loading programs which span across non-continuous memory locations.
 
-The A1C expansion card allows via the physical switch to completely disable the loader program functionality which takes up to the 2 KB of memory
-and to provide continuous 44KB wide RAM address space.
+The A1C expansion card allows via the physical switch to completely disable the ROM/loader program functionality which takes up to the 2 KB of memory (`$4000-$47FF`)
+and to provide continuous 44KB wide RAM address space instead.
 
 ## Memory map
 
-In ROM mode:
+Physical switch in ROM mode:
 
 | address | function |
 | --- | --- |
@@ -22,7 +22,7 @@ In ROM mode:
 | `$4800-$BFFF` | RAM region #2 when ROM banked out |
 | `$4800-$BFFF` | ROM with program contents when ROM banked in |
 
-In RAM mode:
+Physical Switch in RAM mode:
 
 | address | function |
 | --- | --- |
@@ -54,6 +54,10 @@ And to clean the build:
 
 `make clean`
 
+# How to customise?
+
+In order to customise your ROM contents you have to edit the `src/rom_content.a65` source file. You can find the entry table structure documentation in the source file.
+
 ## PCB
 
 The KiCad project files with board design and schematics can be found here:
@@ -66,3 +70,10 @@ The onboard ROM loader program can also automatically load your Applesoft BASIC 
 applesoft-lite project which has been modified to make use of the A1SI expansion card:
 
 http://github.com/flowenol/applesoft-lite
+
+## How to install hardware?
+
+Just put the board in right orientation (as marked on the PCB) in the Apple-1 expansion slot.
+Or you can use the port expander if the on board slot is already occupied:
+
+https://github.com/flowenol/Apple1ExpanderPcb

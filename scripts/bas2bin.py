@@ -3,7 +3,7 @@ import binascii
 import sys
 
 """
-This utility transforms CFFA formated BASIC programs to binary, outputting
+This utility transforms CFFA formatted Integer BASIC programs to binary, outputting
 to file name with LOMEM & HIMEM appended
 """
 if __name__ == "__main__":

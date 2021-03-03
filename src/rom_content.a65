@@ -1,6 +1,8 @@
 * = $4800
 .dsb (*-loader_end), $FF
 
+; start of loader entry table section
+
 * = $4800
 rom_content = $4800
 
@@ -18,15 +20,12 @@ number_of_entries .byt $08
 ;
 ; jump address - word
 
-; start of configuration section
-/*
- Integer BASIC
-
- How to store INTEGER BASIC programs via Apple-1 Serial Interface?
- C100R
- 004A.00FFW 0800.0FFFW
- E2B3R - warm entry point
-*/
+; Integer BASIC
+;
+; How to store INTEGER BASIC programs via ACI/Apple-1 Serial Interface?
+; C100R
+; 004A.00FFW 0800.0FFFW
+; E2B3R - warm entry point
 basic
 basic_seg      .byt $01
 basic_len    .word $1000
@@ -35,9 +34,9 @@ basic_cont_start  .word basic_cont
 basic_str .byt $0D,"INTEGER BASIC"
 basic_jmp_addr   .word $e000
 
-/*
- Apple 30th anniversary demo program
-*/
+;
+; Apple 30th anniversary demo program
+;
 apple30th
 apple30th_seg    .byt $01
 apple30th_len    .word $0D80
@@ -46,24 +45,26 @@ apple30th_cont_start  .word apple30th_cont
 apple30th_str .byt $13,"APPLE 30TH BIRTHDAY"
 apple30th_jmp_addr .word $0280
 
-/*
- Mike Willegal's memory test program
-
- 00: <start_low_byte> <start_high_byte> <end_low_byte> <end_high_byte>
- test address expected actual
-
- 0 -	All zeros - each byte of memory is verified that a 0x00 value can be written and read
- 1	- All ones - each byte of memory is verified that a 0xff value can be written and read
- 2	- Floating ones - eight passes, starting with 0x01 and moving the 1 bit to left each succeeding pass
-    0x02 0x04 0x08 0x10 0x20 0x40 0x80
- 3	- Floating zeros - eight passes, starting with 0x7f and shifting the 0 bit to the right each succeeding pass
-    0xBF 0xDF 0xEF 0xF7 0xFB 0xFD 0xFE
- 4	- Address in Address 1 - one pass with low eight bits of the locations address is written to that location
-    if this fails, you  have a problem with one of the low eight address lines (this is pretty unlikely to fail,
-    since you need these address lines in order to load and run this program)
- 5	- Address in Address 2 - one pass with high eight bits of the locations address written to that location
-    if this fails, you  have a problem with one of the eight high address lines
-*/
+;
+; Mike Willegal's memory test program
+;
+; 00: <start_low_byte> <start_high_byte> <end_low_byte> <end_high_byte>
+; Output format:
+; test_case address expected actual
+;
+; Test case numbers:
+; 0 -	All zeros - each byte of memory is verified that a 0x00 value can be written and read
+; 1	- All ones - each byte of memory is verified that a 0xff value can be written and read
+; 2	- Floating ones - eight passes, starting with 0x01 and moving the 1 bit to left each succeeding pass
+;    0x02 0x04 0x08 0x10 0x20 0x40 0x80
+; 3	- Floating zeros - eight passes, starting with 0x7f and shifting the 0 bit to the right each succeeding pass
+;    0xBF 0xDF 0xEF 0xF7 0xFB 0xFD 0xFE
+; 4	- Address in Address 1 - one pass with low eight bits of the locations address is written to that location
+;    if this fails, you  have a problem with one of the low eight address lines (this is pretty unlikely to fail,
+;    since you need these address lines in order to load and run this program)
+; 5	- Address in Address 2 - one pass with high eight bits of the locations address written to that location
+;    if this fails, you  have a problem with one of the eight high address lines
+;
 memorytest
 memorytest_seg    .byt $02
 memorytest_1_len    .word $0010
@@ -75,12 +76,12 @@ memorytest_2_cont_start  .word memorytest_cont+16
 memorytest_str .byt $10,"MEMORY TEST 280R"
 memorytest_jmp_addr .word $FF1F
 
-/*
- Disassembler program
-
- How to use:
- 44: <low_byte> <high_byte> - disassembler start address
-*/
+;
+; Disassembler program
+;
+; How to use:
+; 44: <low_byte> <high_byte> - disassembler start address
+;
 disassembler
 disassembler_seg      .byt $01
 disassembler_1_len    .word $0200
@@ -89,9 +90,12 @@ disassembler_1_cont_start  .word disassembler_cont
 disassembler_str .byt $11,"DISASSEMBLER 800R"
 disassembler_jmp_addr   .word $FF1F
 
-/*
- Applesoft BASIC port
-*/
+;
+; Applesoft BASIC
+;
+; A modified version from the following fork:
+; https://github.com/flowenol/applesoft-lite
+;
 applesoft
 applesoft_seg    .byt $01
 applesoft_len    .word $2000
@@ -101,9 +105,16 @@ applesoft_str .byt $15,"APPLESOFT BASIC 6000R"
 applesoft_jmp_addr .word $6000
 
 
-/*
- A sample Integer BASIC program with "Matrix" effect
-*/
+;
+; A sample Integer BASIC program - "Matrix" effect
+;
+; 3 segments need to be loaded:
+; 1. Integer BASIC
+; 2. zero page variables for "Matrix" program
+; 3. program contents between LOMEM and HIMEM
+;
+; Then a jump to Integer BASIC warm entrpoint has to be made
+;
 matrix
 matrix_seg    .byt $03
 matrix_1_len    .word $1000
@@ -118,10 +129,16 @@ matrix_3_cont_start  .word matrix_cont+$B6
 matrix_str .byt $0E,"MATRIX (BASIC)"
 matrix_jmp_addr .word $E2B3
 
-
-/*
- A sample Applesoft BASIC program - lemonade stand simulator
-*/
+;
+; A sample Applesoft BASIC program - lemonade stand simulator
+;
+; 3 segments need to be loaded:
+; 1. Applesoft BASIC
+; 2. lemonade stand program content
+; 3. zero page variables for lemonade stand program
+;
+; Then jump to the STARTFROMCART routine
+;
 lemo
 lemo_seg    .byt $03
 lemo_1_len    .word $2000
@@ -134,12 +151,12 @@ lemo_3_len    .word $000D
 lemo_3_addr   .word $0067
 lemo_3_cont_start  .word lemo_fix_cont
 lemo_str .byt $16,"LEMONADE STAND (ASOFT)"
-lemo_jmp_addr .word $7DFE
+lemo_jmp_addr .word $7DF4
 
 
-/*
- Another sample Applesoft BASIC program - counts to 10 in a loop
-*/
+;
+; Another sample Applesoft BASIC program - counts to 10 in a loop
+;
 count10
 count10_seg    .byt $03
 count10_1_len    .word $2000
@@ -152,9 +169,9 @@ count10_3_len    .word $000D
 count10_3_addr   .word $0067
 count10_3_cont_start  .word count10_fix_cont
 count10_str .byt $13,"COUNT TO 10 (ASOFT)"
-count10_jmp_addr .word $7DFE
+count10_jmp_addr .word $7DF4
 
-; end of configuration section
+; end of loader entry table section
 
 ; start of binary content section
 basic_cont       .bin 0,0,"inc/basic.bin"
