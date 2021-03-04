@@ -69,7 +69,7 @@ http://github.com/flowenol/Apple1CartridgePcb
 ## Applesoft BASIC support
 
 The onboard ROM loader program can also automatically load your Applesoft BASIC programs thanks to the branch of the
-applesoft-lite project which has been modified to make use of the A1SI expansion card:
+applesoft-lite project which has been modified to make use of the RAM/ROM expansion card:
 
 http://github.com/flowenol/applesoft-lite
 
