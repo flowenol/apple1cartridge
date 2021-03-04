@@ -162,7 +162,7 @@ count10_seg    .byt $03
 count10_1_len    .word $2000
 count10_1_addr   .word $6000
 count10_1_cont_start  .word applesoft_cont
-count10_2_len    .word $1BF8
+count10_2_len    .word $0051
 count10_2_addr   .word $0801
 count10_2_cont_start  .word count10_cont
 count10_3_len    .word $000D
