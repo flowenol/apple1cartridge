@@ -1,3 +1,5 @@
+![apple1cartridge](/apple1cartridge.jpg)
+
 # apple1cartridge
 
 This repository contains firmware files for the "Apple-1 RAM/ROM Cartridge" expansion card for the Apple-1 computer.
@@ -5,7 +7,7 @@ This repository contains firmware files for the "Apple-1 RAM/ROM Cartridge" expa
 ## Description
 
 This project aims to provide Apple-1 users with a quick way to expand RAM capacity in their systems up to 52 KB and to simultaneously store some Apple-1 programs in
-~30KB of on-board ROM, which can be banked in and out via software. The on-board ROM also contains a loader program which is capable of loading programs which span across non-continuous memory locations.
+~30KB of on-board ROM, which can be banked in and out via software. The on-board ROM also contains a loader program which is capable of loading programs spanning across noncontinuous memory locations.
 
 The A1C expansion card allows via the physical switch to completely disable the ROM/loader program functionality which takes up to the 2 KB of memory (`$4000-$47FF`)
 and to provide continuous 44KB wide RAM address space instead.
