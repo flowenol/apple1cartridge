@@ -22,17 +22,22 @@
 #define str_addr    $40
 
 ; entries scanning variables
-#define entries_counter  $42
-#define entries_scan_addr $43
-#define entry_segments $45
-#define entry_to_load $46
+#define entries_number  $42
+#define entries_counter  $43
+#define entries_counter_bcd $44
+#define entries_scan_addr $45
+#define entry_segments $47
+#define entry_to_load $48
 
 ; jmp addr variable
-#define jmp_addr $47
+#define jmp_addr $49
 
-; option select variables
-#define option_data $49
-#define key_data $50
+#define key_data $4B
+
+#define option_data $00
+
+#define entries_per_page $14
+#define max_entries $63
 
 * = $4000
 
@@ -44,17 +49,49 @@ start
     ; enable rom bank
     sta rom_bank
 
-    ; print entries and get option
+    ; only 99 entries allowed
+    lda rom_content
+    cmp #max_entries
+    bcc store_entries_count
+    lda #max_entries
+
+store_entries_count
+    sta entries_number
+
+show_entries
+    ; print entries and get option - X contains number of digits
     jsr print_entries
+input
     jsr get_option
 
+    ; check number of digits - if not zero then validate option,
+    ; otherwise  print next page or repeat
+    txa
+    bne validate_option
+
+    ; check if all entries have been printed
+    lda entries_counter
+    cmp entries_number
+
+    ; if yes - repeat
+    beq show_entries
+
+    ; else continue printing pages
+    jsr print_entry
+    jmp input
+
+validate_option
     ; option validation
     lda option_data
-    beq start
+    ; invalid - user typed "0" or "00"
+    beq show_entries
 
-    cmp rom_content
+    cmp entries_number
+    ; valid - last entry
     beq valid_option
-    bpl start
+
+    ; invalid out of range
+    bcs show_entries
 
 valid_option
     lda option_data
@@ -252,6 +289,7 @@ print_entries
     ; init entries counter
     lda #$00
     sta entries_counter
+    sta entries_counter_bcd
 
     ; init entries scan addr
     lda #<rom_content
@@ -285,8 +323,13 @@ skip_segment
 
     ; print entry number
     inc entries_counter
-    ldx #entries_counter
-    jsr print_number
+    sed
+    clc
+    lda #$01
+    adc entries_counter_bcd
+    sta entries_counter_bcd
+    jsr print_number_bcd
+    cld
 
     ; print dot and space
     lda #'.'
@@ -313,13 +356,27 @@ skip_segment
     jsr add_to_addr
 
     ; skip entry jump address
+    ldx #entries_scan_addr
     lda #$02
     jsr add_to_addr
 
     ; if not last entry then repeat
-    lda rom_content
+    lda entries_number
+
     cmp entries_counter
+    beq print_entries_done
+
+    jsr entries_page_hit
     bne print_entry
+
+print_entries_page_done
+    ; print choose next string
+    lda #<choose_next_str
+    sta str_addr
+    lda #>choose_next_str
+    sta str_addr+1
+    jsr print_str
+    rts
 
 print_entries_done
     ; print choose string
@@ -328,7 +385,6 @@ print_entries_done
     lda #>choose_str
     sta str_addr+1
     jsr print_str
-
     rts
 
 print_str
@@ -349,56 +405,66 @@ print_str_loop
     bne print_str_loop
     rts
 
-; prints only numbers in range 0-19
-print_number
-    lda #$09
-    cmp $00,X
-    bmi greater_than_nine
-    lda $00,X
+print_number_bcd
+    pha
+    clc
+    and #$F0
+    rol
+    rol
+    rol
+    rol
+    rol
+    beq print_next_digit
     jsr prhex
-    jmp print_number_done
-greater_than_nine
-    lda #$01
+
+print_next_digit
+    pla
+    and #$0F
     jsr prhex
-    ; save number in Y
-    lda $00,X
-    tay
-    ; decrement 10
-    lda #$09
-    sta $00,X
-    tya
-    sbc $00,X
-    jsr prhex
-    ; restore number from Y
-    tya
-    sta $00,X
+
 print_number_done
     rts
+
+entries_page_hit
+    lda entries_counter
+entries_page_loop
+    cmp #entries_per_page
+    beq entries_page_end
+    bcc entries_page_end
+    sec
+    sbc #entries_per_page
+    jmp entries_page_loop
+entries_page_end
+    rts
+
 
 ;;; printing-end
 
 ;;; get-option
+
 get_option
-    ; init digits counter
+    ; stores option number in option_data, digits count in X
+    ; init digits counter in X
     ldx #$00
 get_key
     ; wait for key
     lda kbd_cr
     bpl get_key
     lda kbd_data
+    and #$7F
 
     ; store key data
     sta key_data
 
     ; if CR check if option is satisfied
-    cmp #$8D ; CR
+    cmp #$0D ; CR
     beq get_key_done
 
     ; check range 0-9
-    cmp #$B0 ; 0
+    cmp #$30 ; 0
     bmi get_key
 
-    cmp #$BA ; 9
+    cmp #$3A ; 9
     bpl get_key
 
     ; which digit we are processing?
@@ -416,7 +482,7 @@ one_digit
     ; ???
     sec
     lda key_data
-    sbc #$B0
+    sbc #$30
     sta option_data
 
 echo_key
@@ -446,7 +512,7 @@ two_digit_inc_done
     ; compute int value from second digit
     sec
     lda key_data
-    sbc #$B0
+    sbc #$30
     ; and store in option_data
     sta option_data
 
@@ -461,10 +527,6 @@ two_digit_inc_done
     jmp echo_key
 
 get_key_done
-    ; if CR was pressed as the first key, then simply omit
-    txa
-    beq get_key
-
     ; print CR
     lda #$8D ; CR
     jsr echo
@@ -481,6 +543,7 @@ increment_16bit
 increment_16bit_done
     rts
 
+;; adds A to ZP address in X
 add_to_addr
     clc
     adc $00,X
@@ -497,6 +560,57 @@ add_to_addr_done
 
 welcome_str .byt $15,$0D,"AVAILABLE OPTIONS:",$0D,$0D
 choose_str .byt $0F,$0D,"CHOOSE OPTION:"
+choose_next_str .byt $27,$0D,"CHOOSE OPTION (PRESS RETURN FOR NEXT):"
 
 loader_end
+
+* = $4300
+.dsb (*-loader_end), $FF
+
+* = $4300
+fast_loader_start = $4300
+
+    ; clear decimal mode
+    cld
+
+    ; enable rom bank
+    sta rom_bank
+
+    ; only 99 entries allowed
+    lda rom_content
+    cmp #max_entries
+    bcc store_entries_count_fast
+    lda #max_entries
+
+store_entries_count_fast
+    sta entries_number
+
+validate_option_fast
+    ; option validation
+    lda option_data
+    beq invalid_option_fast
+    cmp entries_number
+    beq valid_option_fast
+    bcs invalid_option_fast
+
+    ; load entry
+valid_option_fast
+    sta entry_to_load
+    jmp load_entry
+
+invalid_option_fast
+    ; print choose string
+    lda #<wrong_option_str
+    sta str_addr
+    lda #>wrong_option_str
+    sta str_addr+1
+    jsr print_str
+
+    jmp monitor
+
+
+wrong_option_str .byt $0F,$0D,"WRONG OPTION",$0D,$0D
+
+fast_loader_end
+
 #include "src/rom_content.a65"

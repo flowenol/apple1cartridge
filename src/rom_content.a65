@@ -1,5 +1,5 @@
 * = $4800
-.dsb (*-loader_end), $FF
+.dsb (*-fast_loader_end), $FF
 
 ; start of loader entry table section
 
@@ -9,7 +9,7 @@ rom_content = $4800
 ; define the number of available entries
 number_of_entries .byt $08
 
-; entry srtucture
+; entry structure
 ; number of segments - byte
 ;
 ; repeat for each segment:
@@ -170,6 +170,7 @@ count10_3_addr   .word $0067
 count10_3_cont_start  .word count10_fix_cont
 count10_str .byt $13,"COUNT TO 10 (ASOFT)"
 count10_jmp_addr .word $7DF4
+
 
 ; end of loader entry table section
 
