@@ -38,6 +38,7 @@ With physical switch in RAM mode:
 
 The contents of this repository are as following:
 
+* gerber/ - gerber files needed to manufacture the PCB
 * inc/ - contains Apple-1 programs in binary format, the package is downloadable [here](https://drive.google.com/file/d/1G0ycKSszlr45RE8Rp6eW-0qxz4MS9qDN/view?usp=sharing)
 * mapping/ - contains EQN and JED files for GAL22V10 based address decoder
 * scripts/ - a bunch of useful python scripts which allow conversion from binary to Woz monitor format and vice versa
