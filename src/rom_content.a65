@@ -7,7 +7,7 @@
 rom_content = $4800
 
 ; define the number of available entries
-number_of_entries .byt $08
+number_of_entries .byt $09
 
 ; entry structure
 ; number of segments - byte
@@ -23,8 +23,20 @@ number_of_entries .byt $08
 ; Integer BASIC
 ;
 ; How to store INTEGER BASIC programs via ACI/Apple-1 Serial Interface?
+;
+; In Woz monitor:
 ; C100R
+; *
 ; 004A.00FFW 0800.0FFFW
+;
+; The above will write the program contents with ZP variables to the ACI/ASI
+;
+; To read the program back:
+; C100R
+; *
+; 004A.00FFR 0800.0FFFR
+;
+; And then run INTEGER BASIC
 ; E2B3R - warm entry point
 basic
 basic_seg      .byt $01
@@ -52,18 +64,26 @@ apple30th_jmp_addr .word $0280
 ; Output format:
 ; test_case address expected actual
 ;
-; Test case numbers:
-; 0 -	All zeros - each byte of memory is verified that a 0x00 value can be written and read
-; 1	- All ones - each byte of memory is verified that a 0xff value can be written and read
-; 2	- Floating ones - eight passes, starting with 0x01 and moving the 1 bit to left each succeeding pass
-;    0x02 0x04 0x08 0x10 0x20 0x40 0x80
-; 3	- Floating zeros - eight passes, starting with 0x7f and shifting the 0 bit to the right each succeeding pass
-;    0xBF 0xDF 0xEF 0xF7 0xFB 0xFD 0xFE
-; 4	- Address in Address 1 - one pass with low eight bits of the locations address is written to that location
-;    if this fails, you  have a problem with one of the low eight address lines (this is pretty unlikely to fail,
-;    since you need these address lines in order to load and run this program)
-; 5	- Address in Address 2 - one pass with high eight bits of the locations address written to that location
-;    if this fails, you  have a problem with one of the eight high address lines
+; Test case numbers with description:
+;
+; 0 -	All zeros - each byte of memory is verified that a 0x00 value can be
+;     written and read
+; 1	- All ones - each byte of memory is verified that a 0xff value can be
+;     written and read
+; 2	- Floating ones - eight passes, starting with 0x01 and moving the 1 bit to
+;     left each succeeding pass:
+;     0x02 0x04 0x08 0x10 0x20 0x40 0x80
+; 3	- Floating zeros - eight passes, starting with 0x7f and shifting the 0 bit
+;     to the right each succeeding pass:
+;     0xBF 0xDF 0xEF 0xF7 0xFB 0xFD 0xFE
+; 4	- Address in Address 1 - one pass with low eight bits of the locations
+;     address is written to that location.
+;     If this fails, you have a problem with one of the low eight address lines
+;     (this is pretty unlikely to fail, since you need these address lines in
+;     order to load and run this program)
+; 5	- Address in Address 2 - one pass with high eight bits of the locations
+;     address is written to that location.
+;     If this fails, you have a problem with one of the eight high address lines
 ;
 memorytest
 memorytest_seg    .byt $02
@@ -75,6 +95,39 @@ memorytest_2_addr   .word $0280
 memorytest_2_cont_start  .word memorytest_cont+16
 memorytest_str .byt $10,"MEMORY TEST 280R"
 memorytest_jmp_addr .word $FF1F
+
+;
+; Krusader Assembler
+;
+; The version from the "Ultimate CFFA Software Collection" does not work on the
+; Apple-1 - it doesn't register any input. It was probably meant for the
+; Replica-1. The version included in the software collection from this project
+; has been reassembled to target the Apple-1 computer and high RAM location
+; ($7100).
+;
+; How to save & restore Krusader source using A1SI card?
+;
+; To save:
+;
+; 1. Type in your source code
+; 2. Press ESC to switch to command mode and then execute M command to lookup
+;    memory occupied by the program source (<start_addr> <end_addr>)
+; 3. Drop to A1SI monitor program by typing: R $C100
+; 4. Save the source via A1SI card using command: <start_addr>.<end_addr>W
+;
+; To load:
+;
+; 1. Load Krusader binary
+; 2. Go to A1SI monitor: C100R
+; 3. Load source via A1SI card: <start_addr>.<end_addr>R
+; 4. Reenter Krusader via warm entry point ($711C)
+krusader
+krusader_seg      .byt $01
+krusader_1_len    .word $0DB9
+krusader_1_addr   .word $7100
+krusader_1_cont_start  .word krusader_cont
+krusader_str .byt $12,"KRUSADER ASSEMBLER"
+krusader_jmp_addr   .word $7100
 
 ;
 ; Disassembler program
@@ -109,11 +162,12 @@ applesoft_jmp_addr .word $6000
 ; A sample Integer BASIC program - "Matrix" effect
 ;
 ; 3 segments need to be loaded:
-; 1. Integer BASIC
+;
+; 1. Integer BASIC binary
 ; 2. zero page variables for "Matrix" program
 ; 3. program contents between LOMEM and HIMEM
 ;
-; Then a jump to Integer BASIC warm entrpoint has to be made
+; Then a jump to Integer BASIC warm entrypoint has to be made
 ;
 matrix
 matrix_seg    .byt $03
@@ -129,11 +183,50 @@ matrix_3_cont_start  .word matrix_cont+$B6
 matrix_str .byt $0E,"MATRIX (BASIC)"
 matrix_jmp_addr .word $E2B3
 
+; How to make your Applesoft BASIC programs to be loadable from A1C expansion
+; card ROM?
+;
+; First you have to save your program to a binary file - the best way to do it
+; is to use Apple-1 Serial Card and "SAVE" routine from the modified fork of the
+; Applesoft BASIC. Just hook the card up to your PC and record the data in any
+; of the terminal emulation programs you prefer.
+;
+; With your BASIC program still loaded in memory, reset to Woz Monitor then
+; display and take note of the following 14 ZP locations:
+;
+; 67.74
+;
+; which correspond to the following Applesoft BASIC variables:
+;
+; TXTTAB = $0067	 Start of program text
+; VARTAB = $0069	 Start of variable storage
+; ARYTAB = $006B	 Start of array storage
+; STREND = $006D	 End of array storage
+; FRETOP = $006F	 Start of string storage
+; FRESPC = $0071	 Temp pntr, string routines
+; MEMSIZ = $0073	 End of string space (HIMEM)
+;
+; These bytes will be used to fix the ZP for the program and will have to be
+; loaded as a separate segment.
+;
+; So to load an Applesoft BASIC program from ROM:
+;
+; 1. Applesoft BASIC binary must be loaded
+; 2. Program content has to be loaded at LOMEM (typically $801)
+;    location
+; 3. ZP fixing bytes specific for the program have to be loaded at location $67
+; 4. STARTFROMCART routine ($7DF4) has to be invoked
+;
+; The STARTFROMCART routine provides an additional entrypoint which doesn't
+; corrupt the required ZP variables.
+;
+
 ;
 ; A sample Applesoft BASIC program - lemonade stand simulator
 ;
 ; 3 segments need to be loaded:
-; 1. Applesoft BASIC
+;
+; 1. Applesoft BASIC binary
 ; 2. lemonade stand program content
 ; 3. zero page variables for lemonade stand program
 ;
@@ -147,7 +240,7 @@ lemo_1_cont_start  .word applesoft_cont
 lemo_2_len    .word $1BF8
 lemo_2_addr   .word $0801
 lemo_2_cont_start  .word lemo_cont
-lemo_3_len    .word $000D
+lemo_3_len    .word $000E
 lemo_3_addr   .word $0067
 lemo_3_cont_start  .word lemo_fix_cont
 lemo_str .byt $16,"LEMONADE STAND (ASOFT)"
@@ -165,7 +258,7 @@ count10_1_cont_start  .word applesoft_cont
 count10_2_len    .word $0051
 count10_2_addr   .word $0801
 count10_2_cont_start  .word count10_cont
-count10_3_len    .word $000D
+count10_3_len    .word $000E
 count10_3_addr   .word $0067
 count10_3_cont_start  .word count10_fix_cont
 count10_str .byt $13,"COUNT TO 10 (ASOFT)"
@@ -178,6 +271,7 @@ count10_jmp_addr .word $7DF4
 basic_cont       .bin 0,0,"inc/basic.bin"
 apple30th_cont   .bin 0,0,"inc/apple30th.bin"
 memorytest_cont .bin 0,0,"inc/a1mt.bin"
+krusader_cont .bin 0,0,"inc/krusader.bin"
 disassembler_cont .bin 0,0,"inc/disassembler.bin"
 applesoft_cont .bin 0,0,"inc/applesoft-lite.bin"
 matrix_cont .bin 0,0,"inc/basic/matrix-0800-1000.bin"

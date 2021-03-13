@@ -229,8 +229,9 @@ skip_entry
     jmp check_load
 
 init_copy
-    lda #$00
+    lda #$01
     sta copy_counter
+    lda #$00
     sta copy_counter+1
 copy
     ; load byte from rom

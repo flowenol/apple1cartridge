@@ -2,17 +2,28 @@
 
 # apple1cartridge
 
-This repository contains firmware files for the "Apple-1 RAM/ROM Cartridge" expansion card for the Apple-1 computer.
+This repository contains firmware and gerber files for the "Apple-1 RAM/ROM Cartridge" expansion card for the Apple-1 computer.
 
 ## Description
 
 This project aims to equip Apple-1 users with a quick way to expand RAM capacity in their systems up to 52 KB and to simultaneously
 store Apple-1 programs in ~30KB of on-board ROM, which can be banked in and out via software. The on-board ROM also contains a loader
-program which is capable of loading programs spanning across noncontinuous memory locations. You can either use a default loader program `4000R`, which displays the list of all available program entries, or the fast loader program `4300R`, which loads the
+program which is capable of loading programs spanning across noncontinuous memory locations. You can either use a default loader
+program `4000R`, which displays the list of all available program entries, or the fast loader program `4300R`, which loads the
 specific program entry automatically.
 
-The A1C expansion card allows to completely disable the ROM/loader functionality (via physical switch) which takes up to 2 KB of
-memory (`$4000-$47FF`) and to provide continuous 44KB wide RAM address space instead (`$1000-$BFFF`).
+The A1C expansion card allows to completely disable the ROM/loader functionality (which takes up to 2 KB of memory at `$4000-$47FF`)
+via physical switch and to provide continuous 44KB wide RAM address space instead (`$1000-$BFFF`). This can be done while the
+system is running, thus after a program is loaded, one can change the switch location disabling ROM banking functionality
+and use the entire memory address space as RAM.
+
+Loader programs in ROM mode copy bytes sequentially from ROM to RAM locations described in the entries table, banking the ROM
+in and out. Each entry may consist of several segments that can be loaded to non adjacent memory locations. For obvious reasons
+the address space between `$4000-$47FF` cannot be utilised at loading time, because it would require the loader program
+to overwrite itself in ROM.
+
+The A1C expansion card in RAM mode works great in conjunction with [Apple-1 Serial Interface](http://github.com/flowenol/apple11serial)
+card or the original ACI, expanding the available address space to load programs.
 
 ## Memory map
 
@@ -41,7 +52,7 @@ The contents of this repository are as following:
 * gerber/ - gerber files needed to manufacture the PCB
 * inc/ - contains Apple-1 programs in binary format, the package is downloadable [here](https://drive.google.com/file/d/1G0ycKSszlr45RE8Rp6eW-0qxz4MS9qDN/view?usp=sharing)
 * mapping/ - contains EQN and JED files for GAL22V10 based address decoder
-* scripts/ - a bunch of useful python scripts which allow conversion from binary to Woz monitor format and vice versa
+* scripts/ - a bunch of useful python scripts which do the conversion between binary and Woz monitor format and vice versa
 * src/ - contains the 6502 assembly sources for the on-board ROM loader programs
 
 ## Requirements
@@ -75,8 +86,8 @@ http://github.com/flowenol/Apple1CartridgePcb
 
 ## Applesoft BASIC support
 
-The onboard ROM loader program can also automatically load your Applesoft BASIC programs thanks to the branch of the
-applesoft-lite project which has been modified to make use of the RAM/ROM expansion card:
+The onboard ROM loader program can also automatically load your Applesoft BASIC programs thanks to the dedicated branch of the
+applesoft-lite project which has been modified to be compatible with the Apple-1 RAM/ROM Cartridge card:
 
 http://github.com/flowenol/applesoft-lite
 
