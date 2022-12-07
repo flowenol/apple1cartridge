@@ -25,6 +25,8 @@ to overwrite itself in ROM.
 The A1C expansion card in RAM mode works great in conjunction with [Apple-1 Serial Interface](http://github.com/flowenol/apple1serial)
 card or the original Apple Cassette Interface, expanding the available address space to load programs.
 
+You can also replace the Apple-1 on-board RAM entirely using an alternative address decoder mapping (check details in the [Mappings](#mappings) section).
+
 ## Memory map
 
 With physical switch in ROM position:
@@ -54,6 +56,17 @@ The contents of this repository are as following:
 * mapping/ - contains .eqn and .jed files for GAL22V10 based address decoder
 * scripts/ - a bunch of useful python scripts which do the conversion between binary and Woz monitor format and vice versa
 * src/ - contains the 6502 assembly sources for the on-board ROM loader programs
+
+## Mappings
+
+There are two .jed files for the GAL22V10 based address decoder:
+
+1. **address_decoder.jed** - defines the standard mapping where additional RAM memory is mapped to the regions `$1000-$BFFF` as
+described above. This mapping assumes that your Apple-1 board has "X" and "W" RAM chips populated and mapped to regions
+`$0000-$0FFF` and `$E000-$EFFF`.
+2. **address_decoder1.jed** - defines an alternative mappig allowing tu run Apple-1 Computer entirely from the A1C. The regions
+`$0000-$0FFF` and `$E000-$EFFF` are additionally mapped to the A1C RAM1 chip. Be sure to remove the "X" and "W" memory chips
+from Apple-1 board for safety, and to disconnect the "X" and "W" lines (if they were mapped to the "0" and "E" segments).
 
 ## Requirements
 
