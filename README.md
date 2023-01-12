@@ -118,7 +118,7 @@ http://github.com/flowenol/Apple1CartridgePcb
 | --- | --- | --- |
 | C1..C5  | Ceramic 100nF | 5 |
 | C6      | Electrolytic 22uF | 1 |
-| R1..R3  | 1K 0.5W       | 3 |
+| R1..R3  | 1K 0.25W       | 3 |
 | BANK1   | 74LS74 dual D flip-flop DIP14 | 1 |
 | DECODER1  | GAL22V10 SPLD (25ns or less) DIP24 | 1 |
 | ROM1      | AT28C256 ROM or similar DIP-28 | 1 |
