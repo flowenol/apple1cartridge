@@ -1,5 +1,4 @@
 import sys
-import binascii
 
 """
 This utility transforms binary data to A1 monitor format, starting offset
@@ -20,7 +19,7 @@ if __name__ == "__main__":
         byte = file.read(1)
         while byte:
 
-            row.append(binascii.hexlify(byte).upper())
+            row.append(byte.hex().upper())
             if len(row) == 8:
                 print_row(row_offset, row)
                 row = list()
